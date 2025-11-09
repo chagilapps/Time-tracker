@@ -1,0 +1,39 @@
+header {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+header h1 {
+  font-size: 2em;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.header-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-controls {
+    justify-content: stretch;
+  }
+
+  .header-controls .btn {
+    flex: 1;
+  }
+}

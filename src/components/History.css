@@ -1,0 +1,85 @@
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.history-filters {
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.history-filters input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.history-list {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.history-item {
+  padding: 15px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.history-item-time {
+  font-size: 12px;
+  color: #666;
+}
+
+.history-item-duration {
+  font-weight: bold;
+  color: var(--primary-color);
+  font-size: 14px;
+}
+
+.history-item-description {
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
+
+.history-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.history-item .delete-btn {
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .history-filters {
+    flex-direction: column;
+  }
+
+  .history-filters input {
+    min-width: 100%;
+  }
+}
