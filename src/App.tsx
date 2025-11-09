@@ -19,8 +19,16 @@ function App() {
   const currentTab = useTimeTrackerStore(state => state.currentTab);
 
   useEffect(() => {
-    initialize();
+    console.log('Time Tracker: Initializing store...');
+    try {
+      initialize();
+      console.log('Time Tracker: Store initialized successfully');
+    } catch (error) {
+      console.error('Time Tracker: Store initialization failed', error);
+    }
   }, [initialize]);
+
+  console.log('Time Tracker: Rendering App component, currentTab:', currentTab);
 
   return (
     <div className="app">
