@@ -9,15 +9,19 @@
   <body>
     <div id="root">
       <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui; color: #666;">
-        <div style="text-align: center;">
+        <div style="text-align: center; padding: 20px; max-width: 90%;">
           <div style="font-size: 48px; margin-bottom: 20px;">⏱️</div>
           <div style="font-size: 18px; font-weight: 600; color: #4CAF50; margin-bottom: 10px;">Time Tracker</div>
           <div id="loading-text" style="font-size: 14px;">Loading...</div>
           <div id="js-status" style="font-size: 12px; color: #999; margin-top: 10px;"></div>
+          <div id="error-display" style="font-size: 11px; color: #f44336; margin-top: 15px; text-align: left; background: #fff3f3; padding: 10px; border-radius: 6px; display: none; word-break: break-word;"></div>
         </div>
       </div>
     </div>
     <script>
+      // Track if React loaded
+      var reactLoaded = false;
+
       // Simple JS test - runs before React loads
       setTimeout(function() {
         var status = document.getElementById('js-status');
@@ -27,13 +31,44 @@
         }
       }, 100);
 
+      // Catch all errors and display them
+      window.addEventListener('error', function(e) {
+        var errorDisplay = document.getElementById('error-display');
+        if (errorDisplay) {
+          errorDisplay.style.display = 'block';
+          errorDisplay.innerHTML = '<strong>Error:</strong><br>' + e.message + '<br><br><small>' + e.filename + ':' + e.lineno + '</small>';
+        }
+      });
+
+      // Catch module loading errors
+      window.addEventListener('unhandledrejection', function(e) {
+        var errorDisplay = document.getElementById('error-display');
+        if (errorDisplay) {
+          errorDisplay.style.display = 'block';
+          errorDisplay.innerHTML = '<strong>Module Error:</strong><br>' + e.reason;
+        }
+      });
+
       // Timeout check - if React doesn't load in 5 seconds
       setTimeout(function() {
-        var loadingText = document.getElementById('loading-text');
-        if (loadingText && loadingText.parentElement) {
-          loadingText.innerHTML = 'Loading is taking longer than expected...<br><small style="font-size: 11px; margin-top: 10px; display: block;">Please check console for errors</small>';
+        if (!reactLoaded) {
+          var loadingText = document.getElementById('loading-text');
+          if (loadingText && loadingText.parentElement) {
+            loadingText.innerHTML = 'React module failed to load';
+            loadingText.style.color = '#f44336';
+          }
+          var status = document.getElementById('js-status');
+          if (status) {
+            status.textContent = 'Check error display below';
+            status.style.color = '#ff9800';
+          }
         }
       }, 5000);
+
+      // React will set this to true when it loads
+      window.reactLoaded = function() {
+        reactLoaded = true;
+      };
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
