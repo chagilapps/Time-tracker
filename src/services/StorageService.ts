@@ -13,8 +13,14 @@ const STORAGE_KEYS = {
 
 export class StorageService {
   private static instance: StorageService;
+  private storageAvailable: boolean;
 
-  private constructor() {}
+  private constructor() {
+    this.storageAvailable = this.checkStorageAvailability();
+    if (!this.storageAvailable) {
+      console.warn('localStorage is not available. Data will not persist.');
+    }
+  }
 
   public static getInstance(): StorageService {
     if (!StorageService.instance) {
@@ -24,9 +30,29 @@ export class StorageService {
   }
 
   /**
+   * Check if localStorage is available (can fail in private browsing on iOS)
+   */
+  private checkStorageAvailability(): boolean {
+    try {
+      const testKey = '__storage_test__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      return true;
+    } catch (e) {
+      console.error('localStorage not available:', e);
+      return false;
+    }
+  }
+
+  /**
    * Save activities to localStorage
    */
   saveActivities(activities: Activity[]): void {
+    if (!this.storageAvailable) {
+      console.warn('Cannot save activities: storage not available');
+      return;
+    }
+
     try {
       const serialized = JSON.stringify(activities, (_key, value) => {
         // Convert Date objects to ISO strings
@@ -38,7 +64,7 @@ export class StorageService {
       localStorage.setItem(STORAGE_KEYS.ACTIVITIES, serialized);
     } catch (error) {
       console.error('Error saving activities:', error);
-      throw new Error('Failed to save activities');
+      // Don't throw on mobile - just log and continue
     }
   }
 
@@ -46,6 +72,10 @@ export class StorageService {
    * Load activities from localStorage
    */
   loadActivities(): Activity[] {
+    if (!this.storageAvailable) {
+      return [];
+    }
+
     try {
       const data = localStorage.getItem(STORAGE_KEYS.ACTIVITIES);
       if (!data) return [];
@@ -98,11 +128,16 @@ export class StorageService {
    * Save settings to localStorage
    */
   saveSettings(settings: Settings): void {
+    if (!this.storageAvailable) {
+      console.warn('Cannot save settings: storage not available');
+      return;
+    }
+
     try {
       localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
     } catch (error) {
       console.error('Error saving settings:', error);
-      throw new Error('Failed to save settings');
+      // Don't throw on mobile - just log and continue
     }
   }
 
@@ -110,6 +145,10 @@ export class StorageService {
    * Load settings from localStorage
    */
   loadSettings(): Settings | null {
+    if (!this.storageAvailable) {
+      return null;
+    }
+
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SETTINGS);
       return data ? JSON.parse(data) : null;
@@ -123,6 +162,10 @@ export class StorageService {
    * Save session data
    */
   saveSession(sessionData: { start: Date; lastNotification: Date }): void {
+    if (!this.storageAvailable) {
+      return;
+    }
+
     try {
       localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify({
         start: sessionData.start.toISOString(),
@@ -137,6 +180,10 @@ export class StorageService {
    * Load session data
    */
   loadSession(): { start: Date; lastNotification: Date } | null {
+    if (!this.storageAvailable) {
+      return null;
+    }
+
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SESSION);
       if (!data) return null;
@@ -156,7 +203,15 @@ export class StorageService {
    * Clear session data
    */
   clearSession(): void {
-    localStorage.removeItem(STORAGE_KEYS.SESSION);
+    if (!this.storageAvailable) {
+      return;
+    }
+
+    try {
+      localStorage.removeItem(STORAGE_KEYS.SESSION);
+    } catch (error) {
+      console.error('Error clearing session:', error);
+    }
   }
 
   /**

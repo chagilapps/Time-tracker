@@ -202,59 +202,93 @@ export const useTimeTrackerStore = create<TimeTrackerState>((set, get) => ({
   },
 
   initialize: () => {
-    // Load settings
-    const savedSettings = StorageService.loadSettings();
-    const settings = savedSettings || DEFAULT_SETTINGS;
+    console.log('Store: Starting initialization...');
 
-    // Update notification permission from browser
-    if ('Notification' in window) {
-      settings.notificationPermission = NotificationService.getPermission();
-    }
+    try {
+      // Load settings with error handling
+      console.log('Store: Loading settings...');
+      const savedSettings = StorageService.loadSettings();
+      const settings = savedSettings || DEFAULT_SETTINGS;
 
-    StorageService.saveSettings(settings);
-
-    // Load activities
-    const activities = StorageService.loadActivities();
-
-    // Check if there's a session in progress
-    const sessionInfo = TimeTrackingService.getSessionInfo();
-    const isTracking = sessionInfo.isActive;
-
-    if (isTracking) {
-      // Resume tracking
-      TimeTrackingService.setNotificationInterval(settings.notificationInterval);
-      TimeTrackingService.setQuietTimes(settings.quietTimes);
-      NotificationService.setSoundEnabled(settings.soundEnabled);
-    }
-
-    // Set up event listener for notifications
-    TimeTrackingService.addEventListener(event => {
-      if (event.type === 'notification-due') {
-        set({ showActivityModal: true });
-      } else if (event.type === 'session-started') {
-        const sessionInfo = TimeTrackingService.getSessionInfo();
-        set({
-          isTracking: true,
-          sessionStartTime: sessionInfo.startTime,
-          lastNotificationTime: sessionInfo.lastNotificationTime,
-        });
-      } else if (event.type === 'session-stopped') {
-        set({
-          isTracking: false,
-          sessionStartTime: null,
-          lastNotificationTime: null,
-        });
-      } else if (event.type === 'activity-added') {
-        get().loadActivities();
+      // Update notification permission from browser (mobile-safe)
+      try {
+        if ('Notification' in window && typeof Notification !== 'undefined') {
+          settings.notificationPermission = NotificationService.getPermission();
+        } else {
+          console.log('Store: Notifications not supported on this device');
+          settings.notificationPermission = 'denied';
+        }
+      } catch (err) {
+        console.warn('Store: Could not check notification permission', err);
+        settings.notificationPermission = 'denied';
       }
-    });
 
-    set({
-      settings,
-      activities,
-      isTracking,
-      sessionStartTime: sessionInfo.startTime,
-      lastNotificationTime: sessionInfo.lastNotificationTime,
-    });
+      StorageService.saveSettings(settings);
+      console.log('Store: Settings loaded successfully');
+
+      // Load activities with error handling
+      console.log('Store: Loading activities...');
+      const activities = StorageService.loadActivities();
+      console.log(`Store: Loaded ${activities.length} activities`);
+
+      // Check if there's a session in progress
+      console.log('Store: Checking for active session...');
+      const sessionInfo = TimeTrackingService.getSessionInfo();
+      const isTracking = sessionInfo.isActive;
+      console.log(`Store: Active session: ${isTracking}`);
+
+      if (isTracking) {
+        // Resume tracking
+        console.log('Store: Resuming active session...');
+        TimeTrackingService.setNotificationInterval(settings.notificationInterval);
+        TimeTrackingService.setQuietTimes(settings.quietTimes);
+        NotificationService.setSoundEnabled(settings.soundEnabled);
+      }
+
+      // Set up event listener for notifications
+      console.log('Store: Setting up event listeners...');
+      TimeTrackingService.addEventListener(event => {
+        if (event.type === 'notification-due') {
+          set({ showActivityModal: true });
+        } else if (event.type === 'session-started') {
+          const sessionInfo = TimeTrackingService.getSessionInfo();
+          set({
+            isTracking: true,
+            sessionStartTime: sessionInfo.startTime,
+            lastNotificationTime: sessionInfo.lastNotificationTime,
+          });
+        } else if (event.type === 'session-stopped') {
+          set({
+            isTracking: false,
+            sessionStartTime: null,
+            lastNotificationTime: null,
+          });
+        } else if (event.type === 'activity-added') {
+          get().loadActivities();
+        }
+      });
+
+      console.log('Store: Setting initial state...');
+      set({
+        settings,
+        activities,
+        isTracking,
+        sessionStartTime: sessionInfo.startTime,
+        lastNotificationTime: sessionInfo.lastNotificationTime,
+      });
+
+      console.log('Store: Initialization complete!');
+    } catch (error) {
+      console.error('Store: Initialization failed', error);
+      // Set safe defaults on error
+      set({
+        settings: DEFAULT_SETTINGS,
+        activities: [],
+        isTracking: false,
+        sessionStartTime: null,
+        lastNotificationTime: null,
+      });
+      throw error; // Re-throw to be caught by error boundary
+    }
   },
 }));
