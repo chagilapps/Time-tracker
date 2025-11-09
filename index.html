@@ -12,10 +12,29 @@
         <div style="text-align: center;">
           <div style="font-size: 48px; margin-bottom: 20px;">⏱️</div>
           <div style="font-size: 18px; font-weight: 600; color: #4CAF50; margin-bottom: 10px;">Time Tracker</div>
-          <div style="font-size: 14px;">Loading...</div>
+          <div id="loading-text" style="font-size: 14px;">Loading...</div>
+          <div id="js-status" style="font-size: 12px; color: #999; margin-top: 10px;"></div>
         </div>
       </div>
     </div>
+    <script>
+      // Simple JS test - runs before React loads
+      setTimeout(function() {
+        var status = document.getElementById('js-status');
+        if (status) {
+          status.textContent = 'JavaScript is running...';
+          status.style.color = '#4CAF50';
+        }
+      }, 100);
+
+      // Timeout check - if React doesn't load in 5 seconds
+      setTimeout(function() {
+        var loadingText = document.getElementById('loading-text');
+        if (loadingText && loadingText.parentElement) {
+          loadingText.innerHTML = 'Loading is taking longer than expected...<br><small style="font-size: 11px; margin-top: 10px; display: block;">Please check console for errors</small>';
+        }
+      }, 5000);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
