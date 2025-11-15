@@ -29,7 +29,7 @@ interface TimeTrackerState {
   startTracking: () => void;
   stopTracking: () => void;
   toggleQuietMode: () => void;
-  addActivity: (description: string, tags: string[]) => void;
+  addActivity: (description: string, tags: string[], plannedNext?: string, mood?: number, excuse?: string) => void;
   skipActivity: () => void;
 
   // Settings actions
@@ -104,9 +104,9 @@ export const useTimeTrackerStore = create<TimeTrackerState>((set, get) => ({
     set({ isQuietMode: newMode });
   },
 
-  addActivity: (description: string, tags: string[]) => {
+  addActivity: (description: string, tags: string[], plannedNext?: string, mood?: number, excuse?: string) => {
     try {
-      TimeTrackingService.addActivity(description, tags);
+      TimeTrackingService.addActivity(description, tags, plannedNext, mood, excuse);
       const activities = StorageService.loadActivities();
       set({ activities, showActivityModal: false });
     } catch (error) {

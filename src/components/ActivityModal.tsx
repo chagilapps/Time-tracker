@@ -19,6 +19,9 @@ export default function ActivityModal() {
 
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
+  const [plannedNext, setPlannedNext] = useState('');
+  const [mood, setMood] = useState<number | undefined>(undefined);
+  const [excuse, setExcuse] = useState('');
   const [timeSinceLastReport, setTimeSinceLastReport] = useState(0);
   const [allTags, setAllTags] = useState<string[]>([]);
 
@@ -40,15 +43,23 @@ export default function ActivityModal() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const tagArray = parseTags(tags);
-    addActivity(description, tagArray);
+    addActivity(description, tagArray, plannedNext, mood, excuse);
+    // Reset form
     setDescription('');
     setTags('');
+    setPlannedNext('');
+    setMood(undefined);
+    setExcuse('');
   };
 
   const handleSkip = () => {
     skipActivity();
+    // Reset form
     setDescription('');
     setTags('');
+    setPlannedNext('');
+    setMood(undefined);
+    setExcuse('');
   };
 
   const handleTagClick = (tag: string) => {
@@ -56,6 +67,16 @@ export default function ActivityModal() {
     if (!currentTags.includes(tag)) {
       setTags(currentTags.length > 0 ? `${tags}, ${tag}` : tag);
     }
+  };
+
+  const getMoodEmoji = (level: number): string => {
+    const emojis = ['😢', '😕', '😐', '😊', '😄'];
+    return emojis[level - 1] || '😐';
+  };
+
+  const getMoodLabel = (level: number): string => {
+    const labels = ['Very Bad', 'Not Great', 'Okay', 'Good', 'Excellent'];
+    return labels[level - 1] || 'Okay';
   };
 
   if (!showModal) return null;
@@ -104,6 +125,46 @@ export default function ActivityModal() {
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="plannedNext">What are you up to next? (Optional):</label>
+            <input
+              type="text"
+              id="plannedNext"
+              placeholder="Plan for next interval..."
+              value={plannedNext}
+              onChange={e => setPlannedNext(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>How did you feel during this time?</label>
+            <div className="mood-selector">
+              {[1, 2, 3, 4, 5].map(level => (
+                <button
+                  key={level}
+                  type="button"
+                  className={`mood-btn ${mood === level ? 'selected' : ''}`}
+                  onClick={() => setMood(level)}
+                  title={getMoodLabel(level)}
+                >
+                  {getMoodEmoji(level)}
+                </button>
+              ))}
+            </div>
+            {mood && <p className="mood-label">{getMoodLabel(mood)}</p>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="excuse">Any excuse/reason? (Optional):</label>
+            <input
+              type="text"
+              id="excuse"
+              placeholder="e.g., I was tired, had an urgent call..."
+              value={excuse}
+              onChange={e => setExcuse(e.target.value)}
+            />
           </div>
 
           <div className="form-actions">

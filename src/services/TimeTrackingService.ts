@@ -147,7 +147,7 @@ export class TimeTrackingService {
   /**
    * Add a new activity
    */
-  addActivity(description: string, tags: string[]): Activity {
+  addActivity(description: string, tags: string[], plannedNext?: string, mood?: number, excuse?: string): Activity {
     if (!this.sessionStartTime || !this.lastNotificationTime) {
       throw new Error('No active session');
     }
@@ -161,6 +161,9 @@ export class TimeTrackingService {
       id: this.generateId(),
       description,
       tags,
+      plannedNext,
+      mood,
+      excuse,
       startTime: previousNotificationTime,
       endTime: this.lastNotificationTime,
       duration: this.notificationInterval,

@@ -64,13 +64,30 @@ export default function Dashboard() {
                   <span className="activity-time">
                     {formatDateTime(activity.startTime)}
                   </span>
-                  <span className="activity-duration">
-                    {formatDuration(activity.duration)}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {activity.mood && (
+                      <span title={`Mood: ${activity.mood}/5`} style={{ fontSize: '18px' }}>
+                        {['😢', '😕', '😐', '😊', '😄'][activity.mood - 1]}
+                      </span>
+                    )}
+                    <span className="activity-duration">
+                      {formatDuration(activity.duration)}
+                    </span>
+                  </div>
                 </div>
                 <div className="activity-item-description">
                   {activity.description}
                 </div>
+                {activity.plannedNext && (
+                  <div className="activity-planned-next">
+                    <strong>📝 Planned next:</strong> {activity.plannedNext}
+                  </div>
+                )}
+                {activity.excuse && (
+                  <div className="activity-excuse">
+                    <strong>💭 Note:</strong> {activity.excuse}
+                  </div>
+                )}
                 {activity.tags.length > 0 && (
                   <div className="activity-item-tags">
                     {activity.tags.map((tag, idx) => (
