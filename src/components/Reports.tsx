@@ -15,6 +15,7 @@ export default function Reports() {
   const tagStats = ReportsService.getTagStats(period);
   const timeline = ReportsService.getTimeline(period);
   const insights = ReportsService.getInsights(period);
+  const plannedVsActual = ReportsService.getPlannedVsActual(period);
 
   const handleExport = () => {
     const csv = ReportsService.exportToCSV(period);
@@ -85,6 +86,40 @@ export default function Reports() {
                   />
                 </div>
                 <div className="tag-report-percentage">{stat.percentage.toFixed(1)}%</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="report-section">
+        <h3>Planned vs Actual</h3>
+        <p className="help-text" style={{ marginBottom: '15px' }}>
+          Compare what you planned to do with what you actually did
+        </p>
+        {plannedVsActual.length === 0 ? (
+          <div className="empty-state">
+            <p>No planned activities to compare</p>
+          </div>
+        ) : (
+          <div className="planned-vs-actual-list">
+            {plannedVsActual.map((comparison, idx) => (
+              <div key={idx} className={`comparison-item ${comparison.matched ? 'matched' : 'not-matched'}`}>
+                <div className="comparison-header">
+                  <span className={`comparison-status ${comparison.matched ? 'status-success' : 'status-warning'}`}>
+                    {comparison.matched ? '✓ Matched' : '✗ Different'}
+                  </span>
+                </div>
+                <div className="comparison-content">
+                  <div className="comparison-row">
+                    <div className="comparison-label">📝 Planned:</div>
+                    <div className="comparison-value planned">{comparison.planned}</div>
+                  </div>
+                  <div className="comparison-row">
+                    <div className="comparison-label">✅ Actual:</div>
+                    <div className="comparison-value actual">{comparison.actual}</div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>

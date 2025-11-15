@@ -169,6 +169,91 @@
   margin-left: 10px;
 }
 
+.planned-vs-actual-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.comparison-item {
+  padding: 15px;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.comparison-item.matched {
+  border-color: #4CAF50;
+  background-color: #f1f8f4;
+}
+
+.comparison-item.not-matched {
+  border-color: #ff9800;
+  background-color: #fff8f0;
+}
+
+.comparison-header {
+  margin-bottom: 10px;
+}
+
+.comparison-status {
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.status-success {
+  color: #4CAF50;
+  background-color: #e8f5e9;
+}
+
+.status-warning {
+  color: #ff9800;
+  background-color: #fff3e0;
+}
+
+.comparison-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comparison-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.comparison-label {
+  font-weight: 500;
+  min-width: 100px;
+  color: #666;
+  font-size: 14px;
+}
+
+.comparison-value {
+  flex: 1;
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.comparison-value.planned {
+  color: #1976D2;
+}
+
+.comparison-value.actual {
+  color: #388E3C;
+}
+
+.help-text {
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+}
+
 @media (max-width: 768px) {
   .insights-grid {
     grid-template-columns: 1fr;
@@ -179,6 +264,15 @@
   }
 
   .timeline-time {
+    min-width: auto;
+  }
+
+  .comparison-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .comparison-label {
     min-width: auto;
   }
 }

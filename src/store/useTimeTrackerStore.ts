@@ -13,6 +13,7 @@ interface TimeTrackerState {
   // Tracking state
   isTracking: boolean;
   isQuietMode: boolean;
+  isStopping: boolean; // Flag to indicate stop tracking in progress
   sessionStartTime: Date | null;
   lastNotificationTime: Date | null;
   showActivityModal: boolean;
@@ -28,6 +29,7 @@ interface TimeTrackerState {
   // Actions
   startTracking: () => void;
   stopTracking: () => void;
+  finalizeStopTracking: () => void;
   toggleQuietMode: () => void;
   addActivity: (description: string, tags: string[], plannedNext?: string, mood?: number, excuse?: string) => void;
   skipActivity: () => void;
@@ -64,6 +66,7 @@ export const useTimeTrackerStore = create<TimeTrackerState>((set, get) => ({
   // Initial state
   isTracking: false,
   isQuietMode: false,
+  isStopping: false,
   sessionStartTime: null,
   lastNotificationTime: null,
   showActivityModal: false,
@@ -88,9 +91,16 @@ export const useTimeTrackerStore = create<TimeTrackerState>((set, get) => ({
   },
 
   stopTracking: () => {
+    // Show activity modal first to log what they did
+    set({ showActivityModal: true, isStopping: true });
+    // Note: Actual stopping happens after they submit or skip in the modal
+  },
+
+  finalizeStopTracking: () => {
     TimeTrackingService.stopTracking();
     set({
       isTracking: false,
+      isStopping: false,
       sessionStartTime: null,
       lastNotificationTime: null,
       showActivityModal: false,
@@ -108,15 +118,41 @@ export const useTimeTrackerStore = create<TimeTrackerState>((set, get) => ({
     try {
       TimeTrackingService.addActivity(description, tags, plannedNext, mood, excuse);
       const activities = StorageService.loadActivities();
-      set({ activities, showActivityModal: false });
+
+      // Check if we need to finalize stopping
+      const { isStopping } = get();
+      if (isStopping) {
+        // User submitted activity while stopping - finalize the stop
+        get().finalizeStopTracking();
+      } else {
+        // Normal activity logging
+        set({ activities, showActivityModal: false });
+      }
     } catch (error) {
       console.error('Error adding activity:', error);
     }
   },
 
   skipActivity: () => {
-    TimeTrackingService.skipNotification();
-    set({ showActivityModal: false });
+    try {
+      // Create a skipped activity record
+      TimeTrackingService.addActivity('Activity skipped', [':skipped']);
+      const activities = StorageService.loadActivities();
+
+      // Check if we need to finalize stopping
+      const { isStopping } = get();
+      if (isStopping) {
+        // User skipped while stopping - finalize the stop
+        get().finalizeStopTracking();
+      } else {
+        // Normal skip
+        set({ activities, showActivityModal: false });
+      }
+    } catch (error) {
+      console.error('Error skipping activity:', error);
+      // Just close the modal if there's an error
+      set({ showActivityModal: false });
+    }
   },
 
   updateSettings: (updates: Partial<Settings>) => {
