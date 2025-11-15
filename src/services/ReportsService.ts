@@ -243,6 +243,52 @@ export class ReportsService {
       longestSession,
     };
   }
+
+  /**
+   * Get planned vs actual comparison
+   * Compares what was planned in previous activity vs what was actually done
+   */
+  getPlannedVsActual(period: ReportPeriod): Array<{
+    plannedActivity: Activity | null;
+    actualActivity: Activity;
+    planned: string;
+    actual: string;
+    matched: boolean;
+  }> {
+    const activities = this.getActivitiesForPeriod(period)
+      .sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
+
+    const comparisons: Array<{
+      plannedActivity: Activity | null;
+      actualActivity: Activity;
+      planned: string;
+      actual: string;
+      matched: boolean;
+    }> = [];
+
+    for (let i = 1; i < activities.length; i++) {
+      const previous = activities[i - 1];
+      const current = activities[i];
+
+      if (previous.plannedNext) {
+        const planned = previous.plannedNext.toLowerCase().trim();
+        const actual = current.description.toLowerCase().trim();
+
+        // Simple matching - check if planned text is in actual description
+        const matched = actual.includes(planned) || planned.includes(actual);
+
+        comparisons.push({
+          plannedActivity: previous,
+          actualActivity: current,
+          planned: previous.plannedNext,
+          actual: current.description,
+          matched,
+        });
+      }
+    }
+
+    return comparisons;
+  }
 }
 
 export default ReportsService.getInstance();

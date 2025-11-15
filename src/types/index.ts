@@ -6,6 +6,9 @@ export interface Activity {
   id: string;
   description: string;
   tags: string[];
+  plannedNext?: string; // What you plan to do in next interval
+  mood?: number; // 1-5 satisfaction/feeling level
+  excuse?: string; // Reason/excuse if not productive
   startTime: Date;
   endTime: Date;
   duration: number; // in milliseconds

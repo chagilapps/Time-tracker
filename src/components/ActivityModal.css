@@ -86,9 +86,52 @@
   justify-content: flex-end;
 }
 
+.mood-selector {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.mood-btn {
+  font-size: 40px;
+  background: none;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 8px;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.mood-btn:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+.mood-btn.selected {
+  border-color: var(--primary-color);
+  opacity: 1;
+  transform: scale(1.1);
+  background-color: #f0f9f0;
+}
+
+.mood-label {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-top: 8px;
+}
+
 @media (max-width: 768px) {
   .modal-content {
     width: 95%;
     padding: 20px;
+  }
+
+  .mood-btn {
+    font-size: 32px;
+    padding: 6px;
   }
 }

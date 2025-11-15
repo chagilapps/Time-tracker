@@ -16,4 +16,9 @@ export default defineConfig({
       '@utils': path.resolve(__dirname, './src/utils'),
     },
   },
+  build: {
+    target: 'es2015',
+    minify: 'terser',
+    cssCodeSplit: true,
+  },
 })

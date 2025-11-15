@@ -12,6 +12,7 @@ import Reports from '@/components/Reports';
 import History from '@/components/History';
 import ActivityModal from '@/components/ActivityModal';
 import SettingsModal from '@/components/SettingsModal';
+import MobileDebugOverlay from '@/components/MobileDebugOverlay';
 import './App.css';
 
 function App() {
@@ -20,11 +21,19 @@ function App() {
 
   useEffect(() => {
     console.log('Time Tracker: Initializing store...');
+    console.log('User Agent:', navigator.userAgent);
+    console.log('Platform:', navigator.platform);
+
     try {
       initialize();
       console.log('Time Tracker: Store initialized successfully');
     } catch (error) {
       console.error('Time Tracker: Store initialization failed', error);
+      if (error instanceof Error) {
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
     }
   }, [initialize]);
 
@@ -49,6 +58,7 @@ function App() {
 
       <ActivityModal />
       <SettingsModal />
+      <MobileDebugOverlay />
     </div>
   );
 }
